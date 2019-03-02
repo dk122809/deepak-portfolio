@@ -4,7 +4,7 @@ var express = require('express'),
 	nodemailer = require("nodemailer"),
 	app = express();
 
-var cache = require('express-redis-cache')();
+
 const compression = require('compression');
 app.use(compression());
 
@@ -13,7 +13,7 @@ app.set("view engine", "ejs");
 app.use(express.static(__dirname + '/public'));
 
 
-app.get('/',cache.route(), (req,res)=>{
+app.get('/', (req,res)=>{
 	res.render('particles.min.ejs');
 });
 app.post('/contact', function (req, res) {

@@ -3,6 +3,10 @@ var express = require('express'),
 	nodemailer = require("nodemailer"),
 	app = express();
 
+const compression = require('compression');
+const app = express();
+app.use(compression());
+
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 app.use(express.static(__dirname + '/public'));

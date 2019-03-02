@@ -4,7 +4,6 @@ var express = require('express'),
 	app = express();
 
 const compression = require('compression');
-const app = express();
 app.use(compression());
 
 app.use(bodyParser.urlencoded({extended: true}));

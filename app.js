@@ -1,28 +1,40 @@
+'use strict'
 var express = require('express'),
 	bodyParser = require('body-parser'),
 	nodemailer = require("nodemailer"),
 	app = express();
 
+var mcache = require('memory-cache');
 const compression = require('compression');
-const http2 = require('http2');
 app.use(compression());
 
-const server = http2.createSecureServer(options);
-
-server.on('stream', (stream, headers) => {
-  stream.respond({
-    'content-type': 'text/html',
-    ':status': 200
-  });
-  stream.end('Hello Word');
-});
+var cache = (duration) => {
+  return (req, res, next) => {
+    let key = '__express__' + req.originalUrl || req.url
+    let cachedBody = mcache.get(key)
+    if (cachedBody) {
+      res.send(cachedBody)
+      return
+    } else {
+      res.sendResponse = res.send
+      res.send = (body) => {
+        mcache.put(key, body, duration * 1000);
+        res.sendResponse(body)
+      }
+      next()
+    }
+  }
+}
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 app.use(express.static(__dirname + '/public'));
-app.get('/', (req,res)=>{
+app.get('/',cache(10), (req,res)=>{
+  setTimeout(() => {
 	res.render('particles.min.ejs');
+}, 5000)
 });
+
 app.post('/contact', function (req, res) {
   let mailOpts, smtpTrans;
   smtpTrans = nodemailer.createTransport({

@@ -4,37 +4,16 @@ var express = require('express'),
 	nodemailer = require("nodemailer"),
 	app = express();
 
-var mcache = require('memory-cache');
+
 const compression = require('compression');
 app.use(compression());
-
-var cache = (duration) => {
-  return (req, res, next) => {
-    let key = '__express__' + req.originalUrl || req.url
-    let cachedBody = mcache.get(key)
-    if (cachedBody) {
-      res.send(cachedBody)
-      return
-    } else {
-      res.sendResponse = res.send
-      res.send = (body) => {
-        mcache.put(key, body, duration * 1000);
-        res.sendResponse(body)
-      }
-      next()
-    }
-  }
-}
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 app.use(express.static(__dirname + '/public'));
-app.get('/',cache(10), (req,res)=>{
-  setTimeout(() => {
+app.get('/', (req,res)=>{
 	res.render('particles.min.ejs');
-}, 5000)
 });
-
 app.post('/contact', function (req, res) {
   let mailOpts, smtpTrans;
   smtpTrans = nodemailer.createTransport({

@@ -4,7 +4,18 @@ var express = require('express'),
 	app = express();
 
 const compression = require('compression');
+const http2 = require('http2');
 app.use(compression());
+
+const server = http2.createSecureServer(options);
+
+server.on('stream', (stream, headers) => {
+  stream.respond({
+    'content-type': 'text/html',
+    ':status': 200
+  });
+  stream.end('Hello Word');
+});
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");

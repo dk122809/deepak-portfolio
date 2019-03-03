@@ -16,8 +16,11 @@ app.get('/robots.txt', function (req, res) {
     res.type('text/plain');
     res.send("User-agent: *\nAllow: /\nsitemap: https://stark-bastion-20221.herokuapp.com/sitemap.xml");
 });
-var sitemap = require('express-sitemap')();
-sitemap.generate(app);
+
+var path = require("path");
+app.get('/sitemap.xml', function(req, res) {
+  res.sendFile(path.join(__dirname, 'path', 'sitemap.xml'));
+});
 
 app.get('/', (req,res)=>{
 	res.render('particles.min.ejs');

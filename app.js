@@ -12,10 +12,17 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 app.use(express.static(__dirname + '/public'));
 
+app.get('/robots.txt', function (req, res) {
+    res.type('text/plain');
+    res.send("User-agent: *\nAllow: /\nsitemap: https://stark-bastion-20221.herokuapp.com/sitemap.xml");
+});
+var sitemap = require('express-sitemap')();
+sitemap.generate(app);
 
 app.get('/', (req,res)=>{
 	res.render('particles.min.ejs');
 });
+
 app.post('/contact', function (req, res) {
   let mailOpts, smtpTrans;
   smtpTrans = nodemailer.createTransport({

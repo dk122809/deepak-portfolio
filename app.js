@@ -4,6 +4,24 @@ var express = require('express'),
 	nodemailer = require("nodemailer"),
 	app = express();
 
+var mcache = require('memory-cache');
+var cache = (duration) => {
+  return (req, res, next) => {
+    let key = '__express__' + req.originalUrl || req.url
+    let cachedBody = mcache.get(key)
+    if (cachedBody) {
+      res.send(cachedBody)
+      return
+    } else {
+      res.sendResponse = res.send
+      res.send = (body) => {
+        mcache.put(key, body, duration * 1000);
+        res.sendResponse(body)
+      }
+      next()
+    }
+  }
+}
 
 const compression = require('compression');
 app.use(compression());
@@ -22,7 +40,7 @@ app.get('/sitemap.xml', function(req, res) {
   res.sendFile(path.join(__dirname, 'path', 'sitemap.xml'));
 });
 
-app.get('/', (req,res)=>{
+app.get('/',cache(10), (req,res)=>{
 	res.render('particles.min.ejs');
 });
 
